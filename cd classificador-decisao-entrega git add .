@@ -1,0 +1,77 @@
+class NodoArvore:
+    def __init__(self, condicao=None, verdadeiro=None, falso=None, resultado=None):
+        self.condicao = condicao  # Condição de divisão (ex: 'distancia > 50')
+        self.verdadeiro = verdadeiro  # Subárvore quando a condição é verdadeira
+        self.falso = falso  # Subárvore quando a condição é falsa
+        self.resultado = resultado  # Resultado final (P0, P1, P2, etc.) quando chegar a uma folha
+
+# Função para classificar uma nova entrada
+def classificar(nodo, entrada):
+    if nodo.resultado is not None:
+        return nodo.resultado  # Se chegou a uma folha, retorna a classe final
+    # Avalia a condição (exemplo: 'distancia > 50')
+    condicao_atual = nodo.condicao
+    valor_atual = entrada[condicao_atual[0]]  # Pega o valor da entrada com base na condição (distância ou tipo de entrega)
+    
+    if valor_atual > condicao_atual[1]:
+        return classificar(nodo.verdadeiro, entrada)  # Vai para a subárvore "verdadeiro"
+    else:
+        return classificar(nodo.falso, entrada)  # Vai para a subárvore "falso"
+
+# Função para criar a árvore de decisão (baseada em regras simples)
+def criar_arvore():
+    # Nó folha: P5 - 15 a 25 dias
+    folha_p5 = NodoArvore(resultado="P5")
+    
+    # Nó folha: P4 - 10 a 15 dias
+    folha_p4 = NodoArvore(resultado="P4")
+    
+    # Nó folha: P3 - 5 a 10 dias
+    folha_p3 = NodoArvore(resultado="P3")
+    
+    # Nó folha: P2 - 3 a 5 dias
+    folha_p2 = NodoArvore(resultado="P2")
+    
+    # Nó folha: P1 - até 48 horas
+    folha_p1 = NodoArvore(resultado="P1")
+    
+    # Nó folha: P0 - até 24 horas
+    folha_p0 = NodoArvore(resultado="P0")
+    
+    # Condição para diferenciar P4 e P5 (distância > 200 km)
+    nodo_p4_p5 = NodoArvore(condicao=("distancia", 200), verdadeiro=folha_p5, falso=folha_p4)
+    
+    # Condição para diferenciar P2 e P3 (distância > 100 km)
+    nodo_p2_p3 = NodoArvore(condicao=("distancia", 100), verdadeiro=folha_p3, falso=folha_p2)
+    
+    # Condição para diferenciar P0 e P1 (tipo_entrega == "urgente")
+    nodo_p0_p1 = NodoArvore(condicao=("tipo_entrega", "urgente"), verdadeiro=folha_p0, falso=folha_p1)
+    
+    # Condição principal (distância > 50 km)
+    nodo_raiz = NodoArvore(condicao=("distancia", 50), verdadeiro=nodo_p2_p3, falso=nodo_p0_p1)
+    
+    # Condição para entrega de longa distância (distância > 150 km)
+    nodo_longas_distancias = NodoArvore(condicao=("distancia", 150), verdadeiro=nodo_p4_p5, falso=nodo_p2_p3)
+    
+    return nodo_raiz
+
+# Função para testar o classificador
+def teste_classificador():
+    # Cria a árvore de decisão
+    arvore = criar_arvore()
+
+    # Entradas de exemplo (distância em km, tipo de entrega)
+    exemplos = [
+        {"distancia": 20, "tipo_entrega": "normal"},  # Esperado: P1
+        {"distancia": 10, "tipo_entrega": "urgente"},  # Esperado: P0
+        {"distancia": 120, "tipo_entrega": "normal"},  # Esperado: P3
+        {"distancia": 55, "tipo_entrega": "normal"},   # Esperado: P2
+        {"distancia": 220, "tipo_entrega": "normal"},  # Esperado: P5
+    ]
+    
+    for entrada in exemplos:
+        resultado = classificar(arvore, entrada)
+        print(f"Entrada: {entrada} -> Resultado: {resultado}")
+
+# Executa os testes
+teste_classificador()

@@ -1,0 +1,8 @@
+import pandas as pd
+
+# Carregando os dados do repositório local
+# Altere o caminho do arquivo conforme o necessário.
+data = pd.read_csv('caminho_para_arquivo_dados.csv')
+
+# Exibindo as primeiras linhas do dataset
+print(data.head())
